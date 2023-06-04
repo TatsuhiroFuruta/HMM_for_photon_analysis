@@ -1,0 +1,48 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=1:GroupC 
+
+cd   $PBS_O_WORKDIR
+echo $PBS_O_WORKDIR
+echo $PBS_NODEFILE
+cat  $PBS_NODEFILE | sort | uniq > $PWD/ooo
+NPROCS=`wc -l < $PWD/ooo`
+echo $NPROCS
+cat $PWD/ooo
+echo $HOSTNAME
+echo =============================
+date
+echo =============================
+date                                > out.sub
+echo ============================= >> out.sub
+OMP_STACKSIZE=36g 
+OMP_NUM_THREADS=1 #28 
+MKL_NUM_THREADS=1 #28
+export OMP_STACKSIZE 
+export OMP_NUM_THREADS
+export MKL_NUM_THREADS
+
+#######
+# HMM #
+#######
+#python ./main_GENT.py --K 20 --N 100000 --dlt 0.01 --noise 0.5 --cut_off 100 --level_ON 1.7 --level_OFF 1.0 > LOG.GENT
+#python ./main_HMM.py --MAXITER 10000 --calc Gibbs --first_moving ON --term 2 --sampling_term 1000 > LOG.HMM-G
+python ./main_HMM.py --input_file vac-001.txt --MAXITER 1000 --calc Block --first_moving ON --term 2 --sampling_term 100 --scaling True --normalized True --x_scale 100.0 --x_shift 0.0 > LOG.HMM-BG
+#python ./main_HMM.py --s_pri ON > LOG.HMM-s_pri
+#python ./main_HMM.py --MAXITER 200 --calc Comp --first_moving ON --term 2 --sampling_term 1 > LOG.HMM-C
+#ln -s s_mat-Gibbs.csv s_mat.csv
+#ln -s lamda_vec-Gibbs.csv lamda_vec.csv
+#ln -s pi_vec-Gibbs.csv pi_vec.csv
+#ln -s A_mat-Gibbs.csv A_mat.csv
+#python ./main_HMM.py --MAXITER 100 --calc Comp --CONTINUE ON > LOG.HMM-C
+#python ./on-off.py --s_mu 0.2 --sigma 0.25 > LOG.on-off
+#rm s_mat.csv 
+#rm lamda_vec.csv 
+#rm pi_vec.csv 
+#rm A_mat.csv 
+
+echo ============================= >> out.sub
+date                               >> out.sub
+echo =============================
+date
+echo =============================
+
